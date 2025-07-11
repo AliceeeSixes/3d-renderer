@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Renderer</title>
+    <link rel="stylesheet" href="scss/app.css" />
+</head>
+<body>
+    <!-- Canvas -->
+     <div class="canvas-main">
+        <canvas height="800" width="800" id="canvas"></canvas>
+     </div>
+
+     <div class="render-controls">
+        <div class="input">
+            <label>Pitch</label>
+            <input id="pitch" value="0" />
+        </div>
+
+        <div class="input">
+            <label>Yaw</label>
+            <input id="yaw" value="0" />
+        </div>
+
+        <div class="input">
+            <label>Roll</label>
+            <input id="roll" value="0" />
+        </div>
+
+        <div">
+            <button onclick="RotateModel();">Rotate</button>
+        </div>
+     </div>
+
+     <div class="options">
+        <button onclick="distanceFalloff = ! distanceFalloff; renderer.Draw();">Distance Falloff</button>
+        <button onclick="normalDiffusion = ! normalDiffusion; renderer.Draw();">Normal Diffusion</button>
+        <button onclick="edges = ! edges; renderer.Draw();">Edges</button>
+     </div>
+
+     <div class="obj-input-buttons">
+        <button onclick="openModal();">Input Raw .obj</button>
+     </div>
+
+
+     <div id="modal-outer">
+        <div class="modal-inner">
+            <button class="button-close" onclick="closeModal();">x</button>
+            <label>Input .obj data</label>
+            <textarea id="obj-input"></textarea>
+            <button class="button-load" onclick="renderer.LoadModel(LoadFromInput()); closeModal();">Load Model</button>
+        </div>
+     </div>
+
+
+     
+     <!-- JS Scripts -->
+     <!-- Core Functionality -->
+     <script src="classes.js"></script>
+     <script src="renderer.js"></script>
+     <script src="obj-parse.js"></script>
+     <script src="ineractivity.js"></script>
+
+     <!-- Default Models -->
+     <script src="models/teapot.js"></script>
+     <script src="models/turtle.js"></script>
+     <script src="models/bus.js"></script>
+
+
+     
+
+     <!-- Init file -->
+     <script src="app.js"></script>
+</body>
+</html>

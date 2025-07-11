@@ -1,0 +1,67 @@
+canvas {
+  border: 1px solid black;
+  height: 600px;
+  width: 600px;
+}
+
+.canvas-main {
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: auto;
+}
+
+.render-controls {
+  display: flex;
+  margin: 10px auto;
+  width: -moz-fit-content;
+  width: fit-content;
+  gap: 5px;
+}
+
+.options,
+.obj-input-buttons {
+  display: flex;
+  margin: 10px auto;
+  width: -moz-fit-content;
+  width: fit-content;
+  gap: 5px;
+}
+
+#modal-outer {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.modal-inner {
+  position: relative;
+  width: 400px;
+  height: -moz-fit-content;
+  height: fit-content;
+  padding: 20px 0 50px;
+  gap: 5px;
+  background: white;
+  margin: 50px auto;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+.modal-inner .button-load {
+  position: absolute;
+  bottom: 5px;
+}
+.modal-inner .button-close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+.modal-inner textarea {
+  width: 200px;
+  height: 200px;
+  overflow: scroll;
+}/*# sourceMappingURL=app.css.map */
