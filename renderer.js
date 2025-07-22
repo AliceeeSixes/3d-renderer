@@ -29,8 +29,8 @@ class Renderer
         y = y/(1+z/d);
 
         // Apply viewport scaling
-        x = x*(canvasWidth/viewportWidth);
-        y = y*(canvasHeight/viewportHeight);
+        x = x*(canvasWidth/viewportSize);
+        y = y*(canvasHeight/viewportSize);
 
 
         return [x, y];
@@ -201,16 +201,11 @@ function SortByZ(a, b) {
 }
 
 
-let viewportHeight = 8;
-let viewportWidth = 8;
-function Viewport(width, height = null) {
-    if (height) {
-        viewportWidth = width;
-        viewportHeight = height;
-    } else {
-        viewportWidth = width;
-        viewportHeight = width;
-    }
+let viewportSize = 8;
+
+function Viewport(size) {
+    viewportSize = size;
+    renderer.Draw();
 }
 
 // RGB to Hex function

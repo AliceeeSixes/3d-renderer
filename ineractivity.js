@@ -30,6 +30,7 @@ function AutoRotate() {
 document.getElementById("canvas").addEventListener("mousedown", StartDrag);
 document.getElementById("canvas").addEventListener("mousemove", Drag);
 document.getElementById("canvas").addEventListener("mouseup", EndDrag);
+document.getElementById("canvas").addEventListener("wheel", Zoom);
 
 
 let mouseXStart;
@@ -69,6 +70,14 @@ function EndDrag(event) {
     renderer.RotateStore(pitch + mouseXDifference, yaw, roll);
 
 }
+
+// Zoom
+function Zoom(event) {
+    let amount = event.deltaY;
+    Viewport(viewportSize + amount/240);
+}
+
+
 
 function openModal() {
     document.getElementById("modal-outer").style.display = "block";
