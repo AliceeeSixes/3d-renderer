@@ -6,16 +6,16 @@ class Renderer
         this.currentPitch = 0;
         this.currentYaw = 0;
         this.currentRoll = 0;
+
+        this.canvas = document.getElementById("canvas");
+        this.ctx = this.canvas.getContext("2d");
+        this.canvasWidth = this.canvas.width;
+        this.canvasHeight = this.canvas.height;
     }
 
     // Perspective projection function
-    static Perspective (point)
+    Perspective (point)
     {
-        const canvas = document.getElementById("canvas");
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
-
-
         let d = -500; // constant for z position of camera plane
  
         let x = point.x;
@@ -29,9 +29,8 @@ class Renderer
         y = y/(1+z/d);
 
         // Apply viewport scaling
-        x = x*(canvasWidth/viewportSize);
-        y = y*(canvasHeight/viewportSize);
-
+        x = x*(this.canvasWidth/viewportSize);
+        y = y*(this.canvasHeight/viewportSize);
 
         return [x, y];
     }
@@ -39,19 +38,20 @@ class Renderer
     // Draw polygon to canvas
     DrawPolygon(polygon, min = null, max = null)
     {
-        const canvas = document.getElementById(this.canvasId);
-        const ctx = canvas.getContext("2d");
         const center = [canvas.width/2, canvas.height/2];
 
-        ctx.beginPath();
-        let start = Renderer.Perspective(polygon.vertices[0]);
-        ctx.moveTo(start[0] + center[0], -start[1] + center[1]);
+        let maxz = max.z;
+        let minz = min.z;
+
+        this.ctx.beginPath();
+        let start = this.Perspective(polygon.vertices[0]);
+        this.ctx.moveTo(start[0] + center[0], -start[1] + center[1]);
         for (let i = 1; i < polygon.vertices.length; i++)
         {
-            let point = Renderer.Perspective(polygon.vertices[i]);
-            ctx.lineTo(point[0] + center[0], -point[1] + center[1]);
+            let point = this.Perspective(polygon.vertices[i]);
+            this.ctx.lineTo(point[0] + center[0], -point[1] + center[1]);
         }
-        ctx.lineTo(start[0] + center[0], -start[1] + center[1]);
+        this.ctx.lineTo(start[0] + center[0], -start[1] + center[1]);
         // ctx.stroke();
 
         // Starting shade
@@ -61,10 +61,10 @@ class Renderer
         // Distance falloff
         if (distanceFalloff) {
             let z = polygon.AverageZ();
-            let mult = ((max.z - z)/(max.z-min.z));
+            let mult = ((maxz - z)/(maxz - minz));
             mult = Math.min(mult, 0.5);
             colour.forEach((num, index) => {
-                num *= 1- mult**2;
+                num *= 1 - mult**2;
                 num = Math.min(Math.max(num, 50), colour[index]);
                 colour[index] = num;
             });
@@ -83,19 +83,17 @@ class Renderer
         if (edges) {
             ctx.stroke();
         }
-        ctx.fillStyle = rgbToHex(colour);
-        ctx.fill();
-        ctx.closePath();
+        this.ctx.fillStyle = "rgb(" + colour[0] + ", " + colour[1] + ", " + colour[2] + ")";
+        this.ctx.fill();
+        this.ctx.closePath();
     }
 
     DrawModel(model)
     {
         model.SaveSurfaceNormals(); // Get surface normals
 
-        const canvas = document.getElementById(this.canvasId);
-        const ctx = canvas.getContext("2d");
 
-        ctx.clearRect(0,0,canvas.width,canvas.height); // clear canvas before drawing
+        this.ctx.clearRect(0,0,canvas.width,canvas.height); // clear canvas before drawing
 
         // Find min/max values
         let min = model.FindMinValues();
@@ -206,28 +204,6 @@ let viewportSize = 8;
 function Viewport(size) {
     viewportSize = size;
     renderer.Draw();
-}
-
-// RGB to Hex function
-function rgbToHex(rgb) {
-    red = rgb[0];
-    green = rgb[1];
-    blue = rgb[2]
-    let redHex = parseInt(red).toString(16);
-    while (redHex.length < 2) {
-        redHex = "0" + redHex;
-    }
-    let greenHex = parseInt(green).toString(16);
-    while (greenHex.length < 2) {
-        greenHex = "0" + greenHex;
-    }
-    let blueHex = parseInt(blue).toString (16);
-    while (blueHex.length < 2) {
-        blueHex = "0" + blueHex;
-    }
-
-    newHex = "#"+redHex+greenHex+blueHex;
-    return(newHex);
 }
 
 let distanceFalloff = true;

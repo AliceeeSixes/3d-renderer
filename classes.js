@@ -52,12 +52,12 @@ class Polygon {
         let vertices = this.vertices;
         for(let i = 0; i < vertices.length; i++) {
             let j = (i + 1) % (vertices.length);      
-            normal[0] += (parseFloat(vertices[i].y) - parseFloat(vertices[j].y)) * (parseFloat(vertices[i].z) + parseFloat(vertices[j].z));
-            normal[1] += (parseFloat(vertices[i].z) - parseFloat(vertices[j].z)) * (parseFloat(vertices[i].x) + parseFloat(vertices[j].x));
-            normal[2] += (parseFloat(vertices[i].x) - parseFloat(vertices[j].x)) * (parseFloat(vertices[i].y) + parseFloat(vertices[j].y));
+            normal[0] += (vertices[i].y - vertices[j].y) * (vertices[i].z + vertices[j].z);
+            normal[1] += (vertices[i].z - vertices[j].z) * (vertices[i].x + vertices[j].x);
+            normal[2] += (vertices[i].x - vertices[j].x) * (vertices[i].y + vertices[j].y);
 
         }
-        let magnitude = Math.sqrt(normal[0]**2 + normal[1]**2 + normal[2]**2)
+        let magnitude = Math.hypot(normal[0], normal[1], normal[2]);
         normal = new Vector3(normal[0]/magnitude, normal[1]/magnitude, normal[2]/magnitude);
         this.normal = normal;
         return normal;
