@@ -48,13 +48,11 @@ function Drag(event) {
     if (dragging) {
         mouseXEnd = event.pageX;
         let mouseXDifference = mouseXEnd - mouseXStart;
-        pitch = renderer.currentPitch;
+        pitch = renderer.currentPitch + mouseXDifference;
         yaw = renderer.currentYaw;
         roll = renderer.currentRoll;
 
-        renderer.Rotate(pitch + mouseXDifference, yaw, roll);
-
-        
+        renderer.Rotate(pitch, yaw, roll);
     }
 }
 

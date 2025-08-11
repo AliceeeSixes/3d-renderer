@@ -81,7 +81,7 @@ class Renderer
         }
 
         if (edges) {
-            ctx.stroke();
+            this.ctx.stroke();
         }
         this.ctx.fillStyle = "rgb(" + colour[0] + ", " + colour[1] + ", " + colour[2] + ")";
         this.ctx.fill();
@@ -135,12 +135,17 @@ class Renderer
     }
 
     RotateStore(pitch, yaw, roll) {
-        this.StoreRotation(pitch,yaw,roll);
-        this.Rotate(pitch,yaw,roll);
+        this.StoreRotation(pitch%360,yaw%360,roll%360);
+        this.Rotate(pitch%360,yaw%360,roll%360);
     }
 
     Rotate(pitch, yaw, roll)
     {
+        // Update rotation input values
+        document.getElementById("pitch").value = pitch;
+        document.getElementById("yaw").value = yaw;
+        document.getElementById("roll").value = roll;
+
         // Convert to radians for calculations
         pitch = pitch * Math.PI / 180;
         yaw = yaw * Math.PI / 180;
@@ -183,6 +188,9 @@ class Renderer
 
         // render new model
         this.DrawModel(model);
+
+
+
 
     }
 
