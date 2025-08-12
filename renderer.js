@@ -11,6 +11,67 @@ class Renderer
         this.ctx = this.canvas.getContext("2d");
         this.canvasWidth = this.canvas.width;
         this.canvasHeight = this.canvas.height;
+
+        this.tileSize = 2;
+        this.tilemap = [];
+
+    }
+
+    Occluded(polygon) {
+        polygon = polygon.Project();
+        let min = polygon.BoundingCorners()[0];
+        let max = polygon.BoundingCorners()[1];
+
+
+        // Find appropraite tiles to check
+        let tilemin = new Vector3(Math.floor((min.x+this.canvasWidth/2)/this.tileSize),Math.floor((min.y+this.canvasHeight/2)/this.tileSize),0);
+        let tilemax = new Vector3(Math.floor((max.x+this.canvasWidth/2)/this.tileSize),Math.floor((max.y+this.canvasHeight/2)/this.tileSize),0);
+
+        let occluded = true;
+        // Determine if occluded
+        // For each tile in the vertical direction
+        for (let ty = tilemin.y; ty <= tilemax.y; ty++) {
+            // For each tile in the horizontal direction
+            for (let tx = tilemin.x; tx <= tilemax.x; tx++) {
+                // Get existing minimum depth
+                let mapz = this.tilemap[tx][ty];
+                let polygonz = polygon.AverageZ();
+                // If polygon depth is greater or almost greater than stored depth, marked as not occluded (strict greater leads to missing polygons)
+                if (polygonz > mapz-1) {
+                    occluded = false;
+                    // If this polygon is shallower than this, update new minimum depth
+                    if (polygonz > mapz) {
+                        this.tilemap[tx][ty] = polygonz;
+                    }
+                }
+            }
+        }
+
+        return occluded;
+
+    }
+
+    OcclusionCull(polygons) {
+        // Reverse z-ordering of polygons to cull front-to-back
+        let reversed = polygons.reverse();
+
+        for (let i = 0; i < this.canvasWidth/this.tileSize; i++) {
+            let array = [];
+            for (let j = 0; j < this.canvasWidth/this.tileSize; j++) {
+                array.push(-Infinity);
+            }
+            this.tilemap[i] = array;
+        }
+
+        let newPolygons = [];
+        reversed.forEach((polygon) => {
+            if (!this.Occluded(polygon)) {
+                newPolygons.push(polygon);
+            }
+            
+        });
+
+        return newPolygons;
     }
 
     // Perspective projection function
@@ -25,14 +86,14 @@ class Renderer
 
 
         // Basic perspective projection
-        x = x/(1+z/d);
-        y = y/(1+z/d);
+        x = x*d/(z+d);
+        y = y*d/(z+d);
 
         // Apply viewport scaling
         x = x*(this.canvasWidth/viewportSize);
         y = y*(this.canvasHeight/viewportSize);
 
-        return [x, y];
+        return new Vector3(x, y, point.z);
     }
 
     // Draw polygon to canvas
@@ -44,15 +105,16 @@ class Renderer
         let minz = min.z;
 
         this.ctx.beginPath();
-        let start = this.Perspective(polygon.vertices[0]);
-        this.ctx.moveTo(start[0] + center[0], -start[1] + center[1]);
+        let start = polygon.vertices[0];
+        this.ctx.moveTo(start.x + center[0], -start.y + center[1]);
+
+        // Draw shape from vertices
         for (let i = 1; i < polygon.vertices.length; i++)
         {
-            let point = this.Perspective(polygon.vertices[i]);
-            this.ctx.lineTo(point[0] + center[0], -point[1] + center[1]);
+            let point = polygon.vertices[i];
+            this.ctx.lineTo(point.x + center[0], -point.y + center[1]);
         }
-        this.ctx.lineTo(start[0] + center[0], -start[1] + center[1]);
-        // ctx.stroke();
+        this.ctx.lineTo(start.x + center[0], -start.y + center[1]);
 
         // Starting shade
         let colour = [200,200,200]; // white
@@ -75,7 +137,7 @@ class Renderer
             let facing = polygon.GetFacing();
             colour.forEach((num, index) => {
                 num *= Math.sqrt(facing);
-                num = Math.min(Math.max(num, 50), colour[index]);
+                num = Math.min(Math.max(num, 80), colour[index]);
                 colour[index] = num;
             });
         }
@@ -92,6 +154,7 @@ class Renderer
     {
         model.SaveSurfaceNormals(); // Get surface normals
 
+        
 
         this.ctx.clearRect(0,0,canvas.width,canvas.height); // clear canvas before drawing
 
@@ -99,10 +162,17 @@ class Renderer
         let min = model.FindMinValues();
         let max = model.FindMaxValues();
 
-        // Sort polygons by z value to prevent z-index issues
+        
         let polygons = model.polygons;
+
+        // New array which excludes occluded polygons
+        polygons = this.OcclusionCull(polygons);
+
+        // Sort polygons by z value to prevent z-index issues
         polygons.sort(SortByZ);
+        
         polygons.forEach((polygon) => {
+            polygon = polygon.Project();
             this.DrawPolygon(polygon, min, max);
         });
 
@@ -112,7 +182,7 @@ class Renderer
 
     LoadModel(model)
     {
-        this.currentModel = model;
+        this.currentModel = CenterModelVertically(model);
         let min = model.FindMinValues();
         let max = model.FindMaxValues();
         let xSize = Math.abs(min.x - max.x);
@@ -121,6 +191,11 @@ class Renderer
         let size = Math.max(xSize, ySize, zSize);
         Viewport(size * 1.5);
         this.Draw();
+    }
+
+    LoadModelRaw(model)
+    {
+        this.LoadModel(ParseObjRaw(model));
     }
 
     Draw() {
@@ -188,10 +263,6 @@ class Renderer
 
         // render new model
         this.DrawModel(model);
-
-
-
-
     }
 
 }

@@ -6,6 +6,9 @@ class Vector3 {
         this.z = z;
     }
 
+    Translate(x, y, z) {
+        return new Vector3(this.x + x, this.y + y, this.z + z);
+    }
 
 
     LinearTransform(matrix) {
@@ -23,6 +26,10 @@ class Vector3 {
 
         return result;
     }
+
+    Project() {
+        return renderer.Perspective(this);
+    }
 }
 
 class Polygon {
@@ -30,6 +37,57 @@ class Polygon {
     {
         this.vertices = vertices;
         this.normal = normal;
+    }
+
+    // Project the polygon onto the screen
+    Project() {
+        let newVertices = [];
+        this.vertices.forEach((vertex) => {
+            newVertices.push(vertex.Project());
+        });
+
+        return new Polygon(newVertices, this.normal);
+    }
+
+    // Return corners of bounding box on x-y plane
+    BoundingCorners() {
+        let min = new Vector3(this.vertices[0].x, this.vertices[0].y, this.vertices[0].z);
+        let max = new Vector3(this.vertices[0].x, this.vertices[0].y, this.vertices[0].z);
+
+        // Find min and max values
+        this.vertices.forEach((vertex) => {
+            if (min.x > vertex.x) {
+                min.x = vertex.x;
+            }
+            if (min.y > vertex.y) {
+                min.y = vertex.y;
+            }
+            if (max.x < vertex.x) {
+                max.x = vertex.x;
+            }
+            if (max.y < vertex.y) {
+                max.y = vertex.y;
+            }
+        });
+
+        return [min, max];
+    }
+
+    // Shift a polygon by a vector
+    Translate(x, y, z) {
+        // Get vertices
+        let vertices = this.vertices;
+
+        // Array for translated vertices
+        let newVertices = [];
+
+        // Translate each vertex and push to array
+        vertices.forEach((vertex) => {
+            newVertices.push(vertex.Translate(x, y, z));
+        });
+
+        // Return new polygon made from translated vertices
+        return new Polygon(newVertices);
     }
 
     LogAverageZ() {
@@ -74,6 +132,33 @@ class Model {
         this.polygons = polygons;
     }
 
+    // Project the model onto the screen
+    Project() {
+        let newPolygons = [];
+        this.polygons.forEach((polygon) => {
+            newPolygons.push(polygon.Project());
+        });
+
+        return new Model(newPolygons);
+    }
+
+    // Shift a polygon by a vector
+    Translate(x, y, z) {
+        // Get model polygons
+        let polygons = this.polygons;
+
+        // Array for translated polygons
+        let newPolygons = [];
+
+        // Translate each polygon and add to array
+        polygons.forEach((polygon) => {
+            newPolygons.push(polygon.Translate(x, y, z));
+        });
+
+        // Return new model with new polygons;
+        return new Model(newPolygons);
+    }
+
     // For debug
     DumpVertices() {
         this.polygons.forEach((polygon) => {
@@ -111,6 +196,15 @@ class Model {
             });
         });
         return max;
+    }
+
+    CenterPoint() {
+        let max = this.FindMaxValues();
+        let min = this.FindMinValues();
+
+        let center = new Vector3((max.x+min.x)/2, (max.y+min.y)/2, (max.z+min.z)/2);
+
+        console.log(center);
     }
 }
 

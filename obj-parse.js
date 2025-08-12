@@ -67,3 +67,23 @@ function LoadFromInput() {
     return ParseObjRaw(rawText);
 }
 
+
+// Center model on vertical axis only
+function CenterModelVertically(model) {
+    let min = model.FindMinValues();
+    let max = model.FindMaxValues();
+
+    let center = new Vector3(0, (min.y+max.y)/2, 0);
+    
+    return model.Translate(-center.x, -center.y, -center.z);
+}
+
+// Move model to geometric center
+function CenterModel(model) {
+    let min = model.FindMinValues();
+    let max = model.FindMaxValues();
+
+    let center = new Vector3((min.x + max.x)/2, (min.y+max.y)/2, (min.x+max.z)/2);
+    
+    return model.Translate(-center.x, -center.y, -center.z);
+}
