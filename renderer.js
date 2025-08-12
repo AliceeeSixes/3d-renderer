@@ -37,7 +37,7 @@ class Renderer
                 let mapz = this.tilemap[tx][ty];
                 let polygonz = polygon.AverageZ();
                 // If polygon depth is greater or almost greater than stored depth, marked as not occluded (strict greater leads to missing polygons)
-                if (polygonz > mapz-1) {
+                if (polygonz > mapz-2) {
                     occluded = false;
                     // If this polygon is shallower than this, update new minimum depth
                     if (polygonz > mapz) {
