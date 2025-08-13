@@ -37,6 +37,14 @@
         <button onclick="distanceFalloff = ! distanceFalloff; renderer.Draw();">Distance Falloff</button>
         <button onclick="normalDiffusion = ! normalDiffusion; renderer.Draw();">Normal Diffusion</button>
         <button onclick="edges = ! edges; renderer.Draw();">Edges</button>
+        <button onclick="occlusionCulling = ! occlusionCulling; renderer.Draw();">Occlusion Culling</button>
+     </div>
+
+     <div class="options-explain">
+        <span>Distance Falloff: shade polygons based on distance from the camera</span>
+        <span>Normal Diffusion: Shade polygons based on angle</span>
+        <span>Edges: Draw edges between polygons</span>
+        <span>Occlusion Culling: Skip rendering hidden polygons - renders faster but may hide some polygons that should be shown</span>
      </div>
 
      <div class="obj-input-buttons">

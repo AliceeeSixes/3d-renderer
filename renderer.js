@@ -14,6 +14,17 @@ class Renderer
 
         this.tileSize = 2;
         this.tilemap = [];
+        this.tilemapempty = [];
+
+        for (let i = 0; i < this.canvasWidth/this.tileSize; i++) {
+            let array = [];
+            for (let j = 0; j < this.canvasWidth/this.tileSize; j++) {
+                array.push(-Infinity);
+            }
+            this.tilemapempty[i] = array;
+        }
+
+        this.occlusionlenience = 2;
 
     }
 
@@ -37,7 +48,7 @@ class Renderer
                 let mapz = this.tilemap[tx][ty];
                 let polygonz = polygon.AverageZ();
                 // If polygon depth is greater or almost greater than stored depth, marked as not occluded (strict greater leads to missing polygons)
-                if (polygonz > mapz-2) {
+                if (polygonz > mapz-this.occlusionlenience) {
                     occluded = false;
                     // If this polygon is shallower than this, update new minimum depth
                     if (polygonz > mapz) {
@@ -55,13 +66,7 @@ class Renderer
         // Reverse z-ordering of polygons to cull front-to-back
         let reversed = polygons.reverse();
 
-        for (let i = 0; i < this.canvasWidth/this.tileSize; i++) {
-            let array = [];
-            for (let j = 0; j < this.canvasWidth/this.tileSize; j++) {
-                array.push(-Infinity);
-            }
-            this.tilemap[i] = array;
-        }
+        this.tilemap = this.tilemapempty;
 
         let newPolygons = [];
         reversed.forEach((polygon) => {
@@ -166,7 +171,9 @@ class Renderer
         let polygons = model.polygons;
 
         // New array which excludes occluded polygons
-        polygons = this.OcclusionCull(polygons);
+        if (occlusionCulling) {
+            polygons = this.OcclusionCull(polygons);
+        }
 
         // Sort polygons by z value to prevent z-index issues
         polygons.sort(SortByZ);
@@ -189,6 +196,8 @@ class Renderer
         let ySize = Math.abs(min.y - max.y);
         let zSize = Math.abs(min.z - max.z);
         let size = Math.max(xSize, ySize, zSize);
+        
+        this.occlusionlenience = zSize/2;
         Viewport(size * 1.5);
         this.Draw();
     }
@@ -288,3 +297,4 @@ function Viewport(size) {
 let distanceFalloff = true;
 let normalDiffusion = true;
 let edges = false;
+let occlusionCulling = false;

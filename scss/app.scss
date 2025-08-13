@@ -24,6 +24,13 @@ canvas {
     gap: 5px;
 }
 
+.options-explain {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: auto;
+}
+
 #modal-outer {
     display: none;
     position: fixed;
