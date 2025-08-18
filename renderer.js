@@ -12,7 +12,7 @@ class Renderer
         this.canvasWidth = this.canvas.width;
         this.canvasHeight = this.canvas.height;
 
-        this.tileSize = 2;
+        this.tileSize = 0.5;
         this.tilemap = [];
         this.tilemapempty = [];
 

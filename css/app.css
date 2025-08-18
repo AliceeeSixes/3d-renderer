@@ -1,4 +1,10 @@
+body {
+  background: #202027;
+  color: white;
+  font-family: sans-serif; }
+
 canvas {
+  background: #dfdfdf;
   border: 1px solid black;
   height: 600px;
   width: 600px; }
@@ -12,19 +18,36 @@ canvas {
   margin: 10px auto;
   width: fit-content;
   gap: 5px; }
+  .render-controls input {
+    width: 50px; }
 
 .options,
 .obj-input-buttons {
   display: flex;
+  flex-direction: column;
   margin: 10px auto;
   width: fit-content;
-  gap: 5px; }
-
-.options-explain {
-  display: flex;
-  flex-direction: column;
-  width: fit-content;
-  margin: auto; }
+  gap: 10px; }
+  .options button,
+  .obj-input-buttons button {
+    cursor: pointer;
+    width: 200px;
+    border-radius: 5px;
+    font-size: 1rem;
+    height: fit-content;
+    align-self: center; }
+    .options button:hover,
+    .obj-input-buttons button:hover {
+      background: #cfcfcf; }
+  .options span,
+  .obj-input-buttons span {
+    display: block;
+    max-width: 400px; }
+  .options div,
+  .obj-input-buttons div {
+    display: flex;
+    flex-direction: row;
+    gap: 10px; }
 
 #modal-outer {
   display: none;
@@ -60,8 +83,17 @@ canvas {
     overflow: scroll; }
 
 a {
+  color: white;
   margin: auto;
   display: block;
   width: fit-content; }
+  a:hover {
+    color: #dfdfdf; }
+
+.divider {
+  width: 400px;
+  display: block;
+  margin: auto;
+  border: 1px solid #dfdfdf; }
 
 /*# sourceMappingURL=app.css.map */
